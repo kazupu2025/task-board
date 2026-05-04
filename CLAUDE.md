@@ -4,30 +4,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## プロジェクト概要
 
-**03_task_board** — SAMURAI SPRINT シリーズ第 3 弾。タスク管理ボードアプリ。  
-バニラ HTML/CSS/JavaScript で構築し、外部フレームワーク・ビルドツールは使用しない。  
-データは `localStorage` に永続化する。
+**03_task_board** — SAMURAI SPRINT シリーズ第 3 弾。React + Vite で構築したタスク管理アプリ。  
+チェックボックスによる完了切り替え・削除・localStorage 永続化をサポートする。
 
-## 開発サーバーの起動
-
-ビルド手順は不要。以下のいずれかでローカル確認する：
+## 開発コマンド
 
 ```bash
-# Python（推奨）
-python -m http.server 8080
-
-# Node.js
-npx serve .
+npm install      # 初回セットアップ
+npm run dev      # 開発サーバー起動 → http://localhost:5173
+npm run build    # 本番ビルド（dist/ に出力）
+npm run preview  # ビルド結果をローカル確認
 ```
-
-ブラウザで `http://localhost:8080` にアクセス。`index.html` を直接ファイルで開いても動作する。
 
 ## Git 運用ルール
 
 **コードを変更するたびに必ず GitHub にプッシュすること。**
 
 ```bash
-# 変更後の基本フロー
 git add .
 git commit -m "コミットメッセージ"
 git push origin main
@@ -39,29 +32,30 @@ git push origin main
 
 ## アーキテクチャ
 
-`script.js` の責務は以下のとおり分離する：
+コンポーネントは `src/App.jsx` 1 ファイルに集約（`App` + `TaskItem` + `CheckIcon`）。
 
-- **データ** — タスクオブジェクトの配列。各タスクは `{ id, title, status, createdAt }` 形式。`status` は `"todo" | "doing" | "done"` の 3 値。
-- **永続化** — `localStorage` への読み書きは `loadTasks()` / `saveTasks()` のみを通す。
-- **状態** — インメモリの `tasks` 配列を単一の信頼できる情報源とする。
-- **描画** — `renderBoard()` が全カラムを再描画（差分更新ではなく全再描画）。
-- **イベント** — タスク追加・ステータス変更・削除のハンドラを `bindEvents()` で一括登録。
+- **状態** — `tasks` 配列（`{ id, text, completed }`）を `useState` で管理。`localStorage` キーは `task-board-v1`。
+- **永続化** — `useEffect` で `tasks` 変化のたびに `localStorage.setItem` を呼ぶ。初期値は `useState` のイニシャライザで `localStorage.getItem` から復元。
+- **スタイル** — CSS Custom Properties (`--bg`, `--accent` 等) を `:root` で一元定義。`--i` インデックスを React の `style` prop 経由で渡し `animation-delay: calc(var(--i) * 0.04s)` で stagger アニメーションを実現。
+- **フォント** — Fraunces（タイトル serif）× DM Mono（本文等幅）。`index.html` の `<link>` でロード。
 
-## ファイル構成（予定）
+## ファイル構成
 
 ```
 03_task_board/
-├── index.html   # 3カラム（ToDo / Doing / Done）のボードレイアウト
-├── style.css    # 全スタイル（CSS Custom Properties でカラー管理）
-└── script.js    # 全ロジック（状態・localStorage・DOM操作）
+├── src/
+│   ├── App.jsx      # App + TaskItem + CheckIcon コンポーネント
+│   ├── App.css      # 全スタイル（CSS Custom Properties）
+│   ├── main.jsx     # React エントリポイント
+│   └── index.css    # box-sizing リセットのみ
+├── index.html       # フォント <link> を含む HTML テンプレート
+├── vite.config.js   # Vite 設定（@vitejs/plugin-react）
+└── package.json
 ```
 
 ## コーディング規約
 
-`01_quiz_app` / `02_weather` と共通：
-
 - `var` 禁止。`const` / `let` を使う
-- `'use strict'` をファイル先頭に記述
-- DOM 取得は `getElementById` / `querySelector` で統一。クラスセレクタはスタイル専用
-- グローバル変数禁止。状態は `script.js` 内のクロージャで管理
-- `localStorage` のキー名は定数 `STORAGE_KEY` で一元管理
+- コンポーネントは関数コンポーネントのみ（クラスコンポーネント禁止）
+- 状態は `App` で一元管理し、子へは props で渡す
+- CSS クラスはスタイル専用、DOM 操作に使わない
