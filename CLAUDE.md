@@ -53,9 +53,40 @@ git push origin main
 └── package.json
 ```
 
+## デプロイ先
+
+**本番 URL**: https://kazupu2025.github.io/task-board/
+
+`main` へのプッシュで GitHub Actions が自動ビルド＆デプロイ（`.github/workflows/deploy.yml`）。  
+ワークフロー確認: https://github.com/kazupu2025/task-board/actions
+
+## 技術スタック
+
+| 用途 | ライブラリ / ツール |
+|------|-------------------|
+| UI フレームワーク | React 19 |
+| ビルドツール | Vite 6 |
+| スタイリング | Plain CSS + CSS Custom Properties（フレームワークなし） |
+| フォント | Fraunces（タイトル）/ DM Mono（本文）— Google Fonts |
+| 永続化 | localStorage（外部ライブラリなし） |
+| ホスティング | GitHub Pages |
+| CI/CD | GitHub Actions |
+
 ## コーディング規約
 
 - `var` 禁止。`const` / `let` を使う
 - コンポーネントは関数コンポーネントのみ（クラスコンポーネント禁止）
 - 状態は `App` で一元管理し、子へは props で渡す
 - CSS クラスはスタイル専用、DOM 操作に使わない
+
+### コンポーネント命名
+
+| 種別 | 規則 | 例 |
+|------|------|----|
+| コンポーネント名 | PascalCase | `App`, `TaskItem`, `CheckIcon` |
+| イベントハンドラ props | `on` + PascalCase | `onToggle`, `onDelete` |
+| ハンドラ関数（定義側） | camelCase の動詞句 | `addTask`, `toggleTask`, `deleteTask` |
+| CSS クラス | kebab-case | `task-item`, `delete-btn`, `add-btn` |
+| CSS カスタムプロパティ | `--` + kebab-case | `--bg`, `--accent`, `--text-muted` |
+
+新しいコンポーネントを追加する場合は `src/` 直下に `ComponentName.jsx` / `ComponentName.css` のペアで配置する。
