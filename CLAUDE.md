@@ -33,7 +33,7 @@ git commit -m "コミットメッセージ"
 git push origin main
 ```
 
-- リモートリポジトリ: `https://github.com/kazupu2025/Task_Board.git`（未作成の場合は作成してから設定）
+- リモートリポジトリ: `https://github.com/kazupu2025/task-board.git`
 - `main` ブランチ直 push で運用（フィーチャーブランチ不要）
 - コミットメッセージは日本語 OK
 
